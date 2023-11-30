@@ -3,14 +3,11 @@
 
 #[cfg(feature = "pimoroni-display-hat-mini")]
 mod pimoroni_display_hat_mini {
-    use std::time::Duration;
-
+    use super::*;
     use rpi_devices::{
         boards::PimoroniDisplayHATMini,
         gpio::{func, Button, DisplayBacklight, RgbLed},
     };
-
-    use serial_test::serial;
 
     #[tokio::test]
     async fn physical_press() {
@@ -128,6 +125,47 @@ mod pimoroni_display_hat_mini {
     #[serial]
     async fn physical_display_init() {
         let unit = PimoroniDisplayHATMini::init().expect("Failed to initialize Display HAT Mini.");
+
+        async {
+            let mut display = unit.display.lock().await;
+
+            display
+                .backlight
+                .transition_to(1., 32, Duration::from_secs(2))
+                .await
+                .expect("Failed to transition backlight to full power.");
+
+            display.fill_white().expect("Failed to fill display white.");
+            tokio::time::sleep(Duration::from_secs(1)).await;
+
+            display.fill_red().expect("Failed to fill display red.");
+            tokio::time::sleep(Duration::from_secs(1)).await;
+
+            display.fill_green().expect("Failed to fill display green.");
+            tokio::time::sleep(Duration::from_secs(1)).await;
+
+            display.fill_blue().expect("Failed to fill display blue.");
+            tokio::time::sleep(Duration::from_secs(1)).await;
+
+            display
+                .backlight
+                .transition_to(0., 32, Duration::from_secs(2))
+                .await
+                .expect("Failed to transition backlight to dark.");
+        }
+        .await;
+    }
+}
+
+#[cfg(feature = "pimoroni-enviro-plus")]
+mod pimoroni_enviro_plus {
+    use super::*;
+    use rpi_devices::boards::PimoroniEnviroPlus;
+
+    #[tokio::test]
+    #[serial]
+    async fn physical_display_init() {
+        let unit = PimoroniEnviroPlus::init().expect("Failed to initialize Display HAT Mini.");
 
         async {
             let mut display = unit.display.lock().await;

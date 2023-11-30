@@ -61,6 +61,8 @@ macro_rules! expand_preset_models {
 
 expand_preset_models!(
     (mipidsi::models::ST7735s, "ST7735s"),
+    (crate::models::panels::ST7735<true>, "ST7735"),
+    (crate::models::panels::ST7735<false>, "ST7735"),
     (mipidsi::models::ST7789, "ST7789")
 );
 
@@ -69,7 +71,11 @@ pub type SpiLcdDisplay<MODEL, const W: u16, const H: u16> =
     LcdDisplay<SPIInterfaceNoCS<Spi, OutputPin>, MODEL, OutputPin, W, H>;
 
 /// Convenience type for a ST7735S display with a SPI interface and a GPIO pin for reset.
-pub type LcdST7735<const W: u16, const H: u16> = SpiLcdDisplay<mipidsi::models::ST7735s, W, H>;
+pub type LcdST7735s<const W: u16, const H: u16> = SpiLcdDisplay<mipidsi::models::ST7735s, W, H>;
+
+/// Convenience type for a ST7735S display with a SPI interface and a GPIO pin for reset.
+pub type LcdST7735<const W: u16, const H: u16, const INVERT: bool = true> =
+    SpiLcdDisplay<crate::models::panels::ST7735<INVERT>, W, H>;
 
 /// Convenience type for a ST7789 display with a SPI interface and a GPIO pin for reset.
 pub type LcdST7789<const W: u16, const H: u16> = SpiLcdDisplay<mipidsi::models::ST7789, W, H>;
