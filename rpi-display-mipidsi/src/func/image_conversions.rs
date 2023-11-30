@@ -10,7 +10,7 @@ pub fn image_from_raw<'a, COLOUR>(
 ) -> Image<'a, ImageRaw<'a, COLOUR>>
 where
     COLOUR: PixelColor + From<<COLOUR as PixelColor>::Raw>,
-    ImageRaw<'a, COLOUR>: ImageDrawable,
+    for<'i> ImageRaw<'i, COLOUR>: ImageDrawable,
 {
     Image::new(raw, Point::new(x, y))
 }

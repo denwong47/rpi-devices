@@ -14,8 +14,12 @@ required-features = ["pimoroni-display-hat-mini"]
 bme280 = [] # DISABLED for now - `embedded_hal` alpha versionings had a lot of conflicts.
 # bme280 = ["dep:bme280"]
 ltr-559 = ["dep:ltr-559"]
-pimoroni-display-hat-mini = ["dep:async-mutex", "rpi-gpio/pimoroni-display-hat-mini"]
-pimoroni-enviro-plus = ["dep:async-mutex", "ltr-559", "bme280"]
+pimoroni-display-hat-mini = ["dep:async-mutex", "rpi-gpio/pimoroni-display-hat-mini", "bmp", "library"]
+pimoroni-enviro-plus = ["dep:async-mutex", "ltr-559", "bme280", "bmp", "library"]
+bmp = ["rpi-display-mipidsi/bmp"]
+text = ["rpi-display-mipidsi/text"]
+plot = ["rpi-display-mipidsi/plot"]
+library = ["rpi-display-mipidsi/library"]
 
 [dependencies]
 async-mutex = { version = "1.4.0", optional = true }

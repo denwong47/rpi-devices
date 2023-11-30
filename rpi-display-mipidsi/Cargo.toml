@@ -9,6 +9,7 @@ edition = "2021"
 bmp = ["dep:tinybmp"]
 text = ["dep:embedded-text"]
 plot = ["dep:embedded-plots"]
+library = ["dep:gxhash"]
 
 [dependencies]
 async-mutex = "1.4.0"
@@ -19,6 +20,7 @@ embedded-graphics = "0.8.1"
 embedded-hal = "0.2.7"
 embedded-plots = { version = "0.2.0", optional = true }
 embedded-text = { version = "0.7.0", features = ["ansi"], optional = true }
+gxhash = { version = "2.2.4", optional = true }
 mipidsi = "0.7.1"
 rpi-errors = { path = "../rpi-errors", features=["display"] }
 rpi-gpio = { path = "../rpi-gpio" }

@@ -54,7 +54,7 @@ fn load_images<'a, 'e, COLOUR, const W: u16>(
 ) -> Vec<Image<'a, ImageRaw<'a, COLOUR>>>
 where
     COLOUR: PixelColor + From<<COLOUR as PixelColor>::Raw>,
-    ImageRaw<'a, COLOUR>: ImageDrawable<Color = COLOUR>,
+    for<'i> ImageRaw<'i, COLOUR>: ImageDrawable<Color = COLOUR>,
 {
     raws.iter()
         .map(|raw| img_func::image_conversions::image_from_raw(raw, 0, 0))
