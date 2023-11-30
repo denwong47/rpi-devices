@@ -529,6 +529,7 @@ dependencies = [
  "rpi-display-mipidsi",
  "rpi-errors",
  "rpi-gpio",
+ "rpi-system",
  "rppal",
  "serial_test",
  "thiserror",
@@ -574,6 +575,15 @@ dependencies = [
  "rpi-errors",
  "rppal",
  "tokio",
+]
+
+[[package]]
+name = "rpi-system"
+version = "0.1.0"
+dependencies = [
+ "lazy_static",
+ "rpi-errors",
+ "rppal",
 ]
 
 [[package]]

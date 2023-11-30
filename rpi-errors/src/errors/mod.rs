@@ -28,6 +28,9 @@ pub enum RPiError<'e> {
     #[error("Tokio reported an async Error: {0}")]
     AsyncError(#[from] tokio::task::JoinError),
 
+    #[error("Raspberry Pi System level Error: {0}")]
+    System(Cow<'e, str>),
+
     #[error("IO Error: {0}")]
     IOError(#[from] std::io::Error),
 

@@ -26,6 +26,7 @@ ltr-559 = { version = "0.1.1", optional = true }
 rpi-display-mipidsi = { path = "rpi-display-mipidsi" }
 rpi-errors = { path = "rpi-errors" }
 rpi-gpio = { path = "rpi-gpio" }
+rpi-system = { path = "rpi-system" }
 rppal = { version = "0.15.0", features = ["hal"] }
 thiserror = "1.0.50"
 tokio = { version = "1.34.0", features = ["time", "rt-multi-thread", "macros", "signal"] }

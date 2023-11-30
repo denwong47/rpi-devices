@@ -1,0 +1,11 @@
+[package]
+name = "rpi-system"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+lazy_static = "1.4.0"
+rpi-errors = { version = "0.1.0", path = "../rpi-errors" }
+rppal = "0.15.0"

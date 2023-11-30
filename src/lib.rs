@@ -1,5 +1,10 @@
 pub mod boards;
 
+/// A library for checking the parameters of the system.
+pub mod system {
+    pub use rpi_system::*;
+}
+
 /// A library for interacting with GPIO pins on a Raspberry Pi, with all polling done
 /// asynchronously.
 ///
@@ -11,6 +16,8 @@ pub mod boards;
 /// # Note
 ///
 /// Re-export of [`rpi_gpio`].
+///
+/// [Pimoroni Display HAT Mini]: https://pinout.xyz/pinout/display_hat_mini
 pub mod gpio {
     pub use rpi_gpio::*;
 }
