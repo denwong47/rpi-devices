@@ -1,5 +1,65 @@
 //! These tests are only useful if you have the physical board attached to your device.
 //! They are ignored by default, but can be run using the feature that corresponds to the board.
+#[allow(unused_imports)]
+use rpi_devices::{
+    display_mipidsi::{func as img_func, pixelcolor, Image, ImageDrawable, ImageRaw, PixelColor},
+    errors::{IntoRPiResult, RPiResult},
+};
+
+#[allow(unused_imports)]
+use std::time::Duration;
+
+#[allow(unused_imports)]
+use serial_test::serial;
+
+#[allow(dead_code)]
+const IMAGE_BIN_PATHS: [&str; 3] = [
+    "tests/images/bus.bin",
+    "tests/images/landscape.bin",
+    "tests/images/tank.bin",
+];
+
+#[allow(dead_code)]
+async fn load_bytes<'e>() -> RPiResult<'e, Vec<Vec<u8>>> {
+    let mut tasks = Vec::with_capacity(IMAGE_BIN_PATHS.len());
+    for path in IMAGE_BIN_PATHS {
+        // This call will make them start running in the background
+        // immediately.
+        tasks.push(tokio::spawn(img_func::fs::read_bytes_from_file(path)));
+    }
+
+    let mut outputs = Vec::with_capacity(tasks.len());
+    for task in tasks {
+        outputs.push(task.await.into_rpi_result()?.into_rpi_result()?)
+    }
+
+    Ok(outputs)
+}
+
+#[allow(dead_code)]
+fn load_raw<'a, 'e, COLOUR, const W: u16>(bytes_array: &'a [Vec<u8>]) -> Vec<ImageRaw<'a, COLOUR>>
+where
+    COLOUR: PixelColor + From<<COLOUR as PixelColor>::Raw>,
+    ImageRaw<'a, COLOUR>: ImageDrawable<Color = COLOUR>,
+{
+    bytes_array
+        .iter()
+        .map(|bytes| img_func::image_conversions::raw_from_bytes(bytes.as_slice(), W as u32))
+        .collect()
+}
+
+#[allow(dead_code)]
+fn load_images<'a, 'e, COLOUR, const W: u16>(
+    raws: &'a [ImageRaw<'a, COLOUR>],
+) -> Vec<Image<'a, ImageRaw<'a, COLOUR>>>
+where
+    COLOUR: PixelColor + From<<COLOUR as PixelColor>::Raw>,
+    ImageRaw<'a, COLOUR>: ImageDrawable<Color = COLOUR>,
+{
+    raws.iter()
+        .map(|raw| img_func::image_conversions::image_from_raw(raw, 0, 0))
+        .collect()
+}
 
 #[cfg(feature = "pimoroni-display-hat-mini")]
 mod pimoroni_display_hat_mini {
@@ -152,6 +212,44 @@ mod pimoroni_display_hat_mini {
                 .transition_to(0., 32, Duration::from_secs(2))
                 .await
                 .expect("Failed to transition backlight to dark.");
+        }
+        .await;
+    }
+
+    #[tokio::test]
+    #[serial]
+    async fn physical_display_images() {
+        let unit = PimoroniDisplayHATMini::init().expect("Failed to initialize Display HAT Mini.");
+
+        async {
+            let mut display = unit.display.lock().await;
+            let bytes_array = load_bytes().await.expect("Failed to load bytes.");
+            let raws = load_raw::<pixelcolor::Rgb565, 320>(&bytes_array);
+            let images = load_images::<pixelcolor::Rgb565, 320>(&raws);
+
+            display.fill_black().expect("Failed to fill display black.");
+
+            for (id, image) in images.into_iter().enumerate() {
+                display.draw_image(image).expect("Failed to draw image.");
+
+                if id == 0 {
+                    // For the first image, once we have loaded the image to the screen, we
+                    // fade in.
+                    display
+                        .backlight
+                        .transition_to(1., 32, Duration::from_secs(2))
+                        .await
+                        .expect("Failed to transition backlight to full power.");
+                }
+                tokio::time::sleep(Duration::from_secs(1)).await;
+            }
+
+            display
+                .backlight
+                .transition_to(0., 32, Duration::from_secs(2))
+                .await
+                .expect("Failed to transition backlight to dark.");
+            display.fill_black().expect("Failed to fill display black.");
         }
         .await;
     }

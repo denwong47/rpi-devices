@@ -1,3 +1,5 @@
+pub mod func;
+
 mod models;
 pub use models::*;
 
@@ -8,4 +10,8 @@ pub use display_interface_spi::{
 };
 pub use mipidsi::{ColorInversion, Orientation};
 
-pub use embedded_graphics::pixelcolor;
+pub use embedded_graphics::{
+    image::{Image, ImageRaw},
+    pixelcolor,
+    prelude::*,
+};

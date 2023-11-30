@@ -37,7 +37,7 @@ impl PimoroniDisplayHATMini {
     pub const SPI_CS: u8 = 7;
     pub const DISPLAY_BACKLIGHT: u8 = 13;
 
-    pub const DISPLAY_ORIENTATION: Orientation = Orientation::LandscapeInverted(false);
+    pub const DISPLAY_ORIENTATION: Orientation = Orientation::LandscapeInverted(true);
     pub const DISPLAY_COLOUR_INVERSION: ColorInversion = ColorInversion::Inverted;
     pub const DISPLAY_RESET: Option<u8> = None;
 

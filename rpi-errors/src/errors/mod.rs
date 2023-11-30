@@ -25,6 +25,9 @@ pub enum RPiError<'e> {
     #[error("Lock Poisoned when {0}")]
     Poisoned(Cow<'e, str>),
 
+    #[error("Tokio reported an async Error: {0}")]
+    AsyncError(#[from] tokio::task::JoinError),
+
     #[error("IO Error: {0}")]
     IOError(#[from] std::io::Error),
 
@@ -51,6 +54,10 @@ pub enum RPiError<'e> {
     #[cfg(feature = "display")]
     #[error("Failed to display content.")]
     DisplayOutputError,
+
+    #[cfg(feature = "display")]
+    #[error("Display interface reported an error: {0}")]
+    DisplayInterfaceError(Cow<'e, str>),
 }
 
 /// Result type with the error being [`RPiError`].

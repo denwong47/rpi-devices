@@ -549,15 +549,18 @@ dependencies = [
  "rpi-errors",
  "rpi-gpio",
  "rppal",
+ "tokio",
 ]
 
 [[package]]
 name = "rpi-errors"
 version = "0.1.0"
 dependencies = [
+ "display-interface",
  "mipidsi",
  "rppal",
  "thiserror",
+ "tokio",
 ]
 
 [[package]]
