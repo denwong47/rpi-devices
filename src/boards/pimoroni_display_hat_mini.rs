@@ -3,7 +3,7 @@
 
 use async_mutex::Mutex;
 use rpi_display_mipidsi::LcdST7789;
-use rpi_display_mipidsi::{ColorInversion, DisplaySPIInterfaceNoCS, Orientation};
+use rpi_display_mipidsi::{ColorInversion, DisplaySPIInterfaceNoCS, Orientation, TearingEffect};
 use rpi_errors::{IntoRPiResult, RPiResult};
 use rpi_gpio::{func, Button, DisplayBacklight, RgbLed};
 use rppal::{
@@ -28,7 +28,7 @@ pub struct PimoroniDisplayHATMini {
 impl PimoroniDisplayHATMini {
     pub const SPI_BUS: Bus = Bus::Spi0;
     pub const SPI_SLAVE: SlaveSelect = SlaveSelect::Ss1;
-    pub const SPI_CLOCK_SPEED: u32 = 60_000_000;
+    pub const SPI_CLOCK_SPEED: u32 = 70_000_000;
     pub const SPI_MODE: SpiMode = SpiMode::Mode0;
 
     pub const SPI_MOSI: u8 = 10;
@@ -39,6 +39,7 @@ impl PimoroniDisplayHATMini {
 
     pub const DISPLAY_ORIENTATION: Orientation = Orientation::LandscapeInverted(true);
     pub const DISPLAY_COLOUR_INVERSION: ColorInversion = ColorInversion::Inverted;
+    pub const DISPLAY_TEARING_EFFECT: TearingEffect = TearingEffect::HorizontalAndVertical;
     pub const DISPLAY_RESET: Option<u8> = None;
 
     pub const BUTTON_A: u8 = 5;
@@ -100,6 +101,7 @@ impl PimoroniDisplayHATMini {
                 Delay::new(),
                 Self::DISPLAY_ORIENTATION,
                 Self::DISPLAY_COLOUR_INVERSION,
+                Self::DISPLAY_TEARING_EFFECT,
                 backlight,
             )?
             .into(),

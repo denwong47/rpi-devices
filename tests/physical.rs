@@ -324,15 +324,15 @@ mod pimoroni_display_hat_mini {
         let bmp = img_func::bmp::bmp_from_bytes::<pixelcolor::Rgb565>(bytes.as_slice())
             .expect("Failed to load BMP.");
 
-        const STEPS: u32 = 200;
         const TRANSVERE: u32 = 463;
+        const STEPS: u32 = TRANSVERE;
 
         let transition = img_func::transitions::transverse(0, 0, TRANSVERE, 0);
         let mut frames = img_func::transitions::Transition::new_self(
             &bmp,
             transition,
             STEPS,
-            Duration::from_secs(10),
+            Duration::from_secs(22),
         );
 
         frames

@@ -3,7 +3,7 @@
 
 use async_mutex::Mutex;
 use rpi_display_mipidsi::LcdST7735;
-use rpi_display_mipidsi::{ColorInversion, DisplaySPIInterfaceNoCS, Orientation};
+use rpi_display_mipidsi::{ColorInversion, DisplaySPIInterfaceNoCS, Orientation, TearingEffect};
 use rpi_errors::{IntoRPiResult, RPiResult};
 use rpi_gpio::{func, DisplayBacklight};
 use rppal::{
@@ -33,6 +33,7 @@ impl PimoroniEnviroPlus {
 
     pub const DISPLAY_ORIENTATION: Orientation = Orientation::LandscapeInverted(true);
     pub const DISPLAY_COLOUR_INVERSION: ColorInversion = ColorInversion::Inverted;
+    pub const DISPLAY_TEARING_EFFECT: TearingEffect = TearingEffect::Off;
     pub const DISPLAY_RESET: Option<u8> = None;
 
     pub const I2C_SDA: u8 = 2;
@@ -94,6 +95,7 @@ impl PimoroniEnviroPlus {
                 Delay::new(),
                 Self::DISPLAY_ORIENTATION,
                 Self::DISPLAY_COLOUR_INVERSION,
+                Self::DISPLAY_TEARING_EFFECT,
                 backlight,
             )?
             .into(),

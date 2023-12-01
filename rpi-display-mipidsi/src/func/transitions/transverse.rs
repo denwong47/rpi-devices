@@ -20,8 +20,6 @@ where
     let delta_x = end_x as i32 - start_x as i32;
     let delta_y = end_y as i32 - start_y as i32;
 
-    println!("delta_x: {}, delta_y: {}", delta_x, delta_y);
-
     // The second image is not used.
     move |from: &'a T,
           _: &'a T,
@@ -36,7 +34,11 @@ where
             (ratio * delta_y as f32) as i32 + start_y as i32,
         );
 
-        println!("step: {}, dx: {}, dy: {}", step, dx, dy);
+        #[cfg(feature = "debug")]
+        logger::trace(&format!(
+            "Transversing step: {}, dx: {}, dy: {}",
+            step, dx, dy
+        ));
 
         Ok(func::crop::crop_raw(from, dx, dy, w as u32, h as u32))
     }

@@ -26,7 +26,7 @@ pub mod gpio {
 ///
 /// # Note
 ///
-/// Re-epxort of [`rpi_errors`].
+/// Re-export of [`rpi_errors`].
 pub mod errors {
     pub use rpi_errors::*;
 }
@@ -36,4 +36,13 @@ pub mod errors {
 pub mod display_mipidsi {
     /// Re-export of [`rpi_display_mipidsi`]
     pub use rpi_display_mipidsi::*;
+}
+
+/// Logger for this whole crate.
+///
+/// # Note
+///
+/// Re-export of [`rpi_logger`].
+pub mod logger {
+    pub use rpi_logger::*;
 }

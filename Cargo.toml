@@ -1,3 +1,4 @@
+workspace = { members = ["rpi-logger"] }
 [package]
 name = "rpi-devices"
 version = "0.1.0"
@@ -11,6 +12,7 @@ path = "./examples/colour-on-press/src/main.rs"
 required-features = ["pimoroni-display-hat-mini"]
 
 [features]
+debug = ["rpi-display-mipidsi/debug"]
 bme280 = [] # DISABLED for now - `embedded_hal` alpha versionings had a lot of conflicts.
 # bme280 = ["dep:bme280"]
 ltr-559 = ["dep:ltr-559"]
@@ -33,6 +35,7 @@ ltr-559 = { version = "0.1.1", optional = true }
 rpi-display-mipidsi = { path = "rpi-display-mipidsi" }
 rpi-errors = { path = "rpi-errors" }
 rpi-gpio = { path = "rpi-gpio" }
+rpi-logger = { version = "0.1.0", path = "rpi-logger" }
 rpi-system = { path = "rpi-system" }
 rppal = { version = "0.15.0", features = ["hal"] }
 thiserror = "1.0.50"

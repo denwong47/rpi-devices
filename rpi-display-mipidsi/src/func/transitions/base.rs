@@ -27,6 +27,7 @@ where
     TO: ImageDrawable<Color = COLOUR>,
     F: Fn(&'a T1, &'a T2, u32, u32, u16, u16) -> RPiResult<'a, TO>,
 {
+    /// Calculate the frame for the given step.
     fn calculate_frame(
         &self,
         from: &'a T1,
@@ -59,6 +60,9 @@ where
 
     transition: F,
 
+    #[cfg(feature = "debug")]
+    skipped_count: u32,
+
     _phantom: PhantomData<TO>,
 }
 
@@ -85,6 +89,9 @@ where
             step_duration,
 
             transition,
+
+            #[cfg(feature = "debug")]
+            skipped_count: 0,
 
             _phantom: PhantomData,
         }
@@ -195,12 +202,30 @@ where
         // The second check is necessary to confirm that we have at least issued the
         // last step of the transition once.
         if step >= self.steps && self.step >= self.steps {
+            #[cfg(feature = "debug")]
+            {
+                let rendered_count = self.step - self.skipped_count;
+                logger::info(&format!(
+                    "Transition finished, rendered {} frames, skipped {} frames @ {} FPS.",
+                    rendered_count,
+                    self.skipped_count,
+                    rendered_count as f32 / self.start_time().elapsed().as_secs_f32()
+                ));
+            }
+
             return None;
         }
 
         let result = self
             .transition
             .calculate_frame(self.from, self.to, step, self.steps, W, H);
+
+        #[cfg(feature = "debug")]
+        if step > self.step + 1 {
+            let skipped = step - self.step - 1;
+            logger::debug(&format!("Frame overtime, skipping {} frames.", skipped));
+            self.skipped_count += skipped;
+        }
 
         self.step = step;
         Some(result)
