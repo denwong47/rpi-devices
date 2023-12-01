@@ -3,7 +3,7 @@
 use crate::foreign_types::*;
 
 /// Create an [`Image`] from an [`ImageRaw`], at the given position.
-pub fn image_from_raw<'a, COLOUR, T>(raw: &'a T, x: i32, y: i32) -> Image<'a, T>
+pub fn image_from_raw<COLOUR, T>(raw: &T, x: i32, y: i32) -> Image<'_, T>
 where
     COLOUR: PixelColor + From<<COLOUR as PixelColor>::Raw>,
     T: ImageDrawable<Color = COLOUR>,
@@ -13,7 +13,7 @@ where
 
 /// Create an [`ImageRaw`] from a slice of [`u8`]s, rendered using the given
 /// width.
-pub fn raw_from_bytes<'a, COLOUR>(bytes: &'a [u8], width: u32) -> ImageRaw<'a, COLOUR>
+pub fn raw_from_bytes<COLOUR>(bytes: &[u8], width: u32) -> ImageRaw<'_, COLOUR>
 where
     COLOUR: PixelColor + From<<COLOUR as PixelColor>::Raw>,
 {

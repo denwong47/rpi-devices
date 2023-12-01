@@ -1,23 +1,22 @@
+#![allow(unused_imports)]
+
 //! These tests are only useful if you have the physical board attached to your device.
 //! They are ignored by default, but can be run using the feature that corresponds to the board.
 //!
 
-#[allow(unused_imports)]
 use std::ops::DerefMut;
 
-#[allow(unused_imports)]
 use rpi_devices::{
     display_mipidsi::{func as img_func, *},
     errors::{IntoRPiResult, RPiResult},
 };
 
-#[allow(unused_imports)]
 use std::time::Duration;
 
-#[allow(unused_imports)]
 use serial_test::serial;
 
-#[allow(dead_code)]
+use rpi_devices::logger;
+
 const IMAGE_BIN_PATHS: [&str; 3] = [
     "tests/images/bus.bin",
     "tests/images/landscape.bin",
@@ -78,7 +77,9 @@ mod pimoroni_display_hat_mini {
     async fn physical_press() {
         let gpio = func::init_gpio().unwrap();
 
-        println!("\x1b[38;5;11mPress a button on the Pimoroni Display HAT Mini...\x1b[39m");
+        logger::debug(&format!(
+            "\x1b[38;5;11mPress a button on the Pimoroni Display HAT Mini...\x1b[39m"
+        ));
         macro_rules! expand_buttons {
             ($((
                 $name:ident,
@@ -91,9 +92,9 @@ mod pimoroni_display_hat_mini {
                 tokio::select! {
                     $(
                         result = $name.pressed_and_released(None) => if result.unwrap_or(false) {
-                            println!("Pressed {}", stringify!($name));
+                            logger::info(&format!("Pressed {}", stringify!($name)));
                         } else {
-                            println!("Timeout {} or error", stringify!($name));
+                            logger::warning(&format!("Timeout {} or error", stringify!($name)));
                         },
                     )*
                 }
@@ -165,21 +166,29 @@ mod pimoroni_display_hat_mini {
         let mut backlight =
             DisplayBacklight::new(&gpio, PimoroniDisplayHATMini::DISPLAY_BACKLIGHT, 50.);
 
-        println!("\x1b[38;5;11mTransitioning the backlight from OFF to 100%...\x1b[39m");
+        logger::debug(&format!(
+            "\x1b[38;5;11mTransitioning the backlight from OFF to 100%...\x1b[39m"
+        ));
         backlight
             .transition_to(1.0, 32, Duration::from_secs(2))
             .await
             .expect("Failed to transition to 1.0");
 
-        println!("\x1b[38;5;11mDisabling the backlight for 1s...\x1b[39m");
+        logger::debug(&format!(
+            "\x1b[38;5;11mDisabling the backlight for 1s...\x1b[39m"
+        ));
         backlight.disable().expect("Failed to disable");
         tokio::time::sleep(Duration::from_secs(1)).await;
 
-        println!("\x1b[38;5;11mRe-enabling the backlight for 1s...\x1b[39m");
+        logger::debug(&format!(
+            "\x1b[38;5;11mRe-enabling the backlight for 1s...\x1b[39m"
+        ));
         backlight.enable().expect("Failed to enable");
         tokio::time::sleep(Duration::from_secs(1)).await;
 
-        println!("\x1b[38;5;11mTransitioning the backlight from 100% to OFF...\x1b[39m");
+        logger::debug(&format!(
+            "\x1b[38;5;11mTransitioning the backlight from 100% to OFF...\x1b[39m"
+        ));
         backlight
             .transition_to(0., 32, Duration::from_secs(2))
             .await
@@ -294,7 +303,9 @@ mod pimoroni_display_hat_mini {
 
             // TODO write the actual function in a way that just drops frames if we're too slow.
             let frame_time = tokio::time::Instant::now() - start_time;
-            println!("Target duration: {step_duration:?}, Frame time: {frame_time:?}");
+            logger::debug(&format!(
+                "Target duration: {step_duration:?}, Frame time: {frame_time:?}"
+            ));
             start_time = tokio::time::Instant::now();
             tokio::time::sleep_until(target_time).await;
         }
@@ -316,10 +327,9 @@ mod pimoroni_display_hat_mini {
     async fn physical_transverse_bmp() {
         let unit = PimoroniDisplayHATMini::init().expect("Failed to initialize Display HAT Mini.");
 
-        let mut display = unit.display.lock().await;
+        let mut lcd = unit.display.lock().await;
 
-        display
-            .backlight
+        lcd.backlight
             .set_value(1.)
             .expect("Failed to set backlight value.");
 
@@ -334,7 +344,7 @@ mod pimoroni_display_hat_mini {
 
         let transition = img_func::transitions::transverse(STEPS, 0, 0, TRANSVERE, 0);
         img_func::transitions::Transition::new_self(
-            display.deref_mut(),
+            &mut lcd.screen,
             &bmp,
             transition,
             STEPS,
@@ -344,8 +354,7 @@ mod pimoroni_display_hat_mini {
         .await
         .expect("Unable to transverse image.");
 
-        display
-            .backlight
+        lcd.backlight
             .disable()
             .expect("Failed to disable backlight.");
     }

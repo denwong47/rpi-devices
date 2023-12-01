@@ -1,8 +1,9 @@
 //! [`LcdDisplay`] type and instantiation methods, along with common models.
 
 use rpi_gpio::DisplayBacklight;
-#[cfg(feature = "debug")]
-use std::time::Instant;
+
+// #[cfg(feature = "debug")]
+// use std::time::Instant;
 
 use crate::foreign_types::*;
 
@@ -17,7 +18,7 @@ where
 
     pub backlight: DisplayBacklight,
 
-    pub(crate) display: RawDisplay<DI, MODEL, RST>,
+    pub screen: RawDisplay<DI, MODEL, RST>,
 }
 
 impl<DI, MODEL, RST, const W: u16, const H: u16> Dimensions for LcdDisplay<DI, MODEL, RST, W, H>
@@ -28,51 +29,52 @@ where
 {
     /// Get the dimension of the display.
     fn bounding_box(&self) -> embedded_graphics::primitives::Rectangle {
-        self.display.bounding_box()
+        self.screen.bounding_box()
     }
 }
 
-impl<DI, MODEL, RST, const W: u16, const H: u16> DrawTarget for LcdDisplay<DI, MODEL, RST, W, H>
-where
-    DI: WriteOnlyDataCommand,
-    MODEL: DisplayModel,
-    RST: OutputPinType,
-{
-    type Color = MODEL::ColorFormat;
-    type Error = DisplayError;
+// // SIGNIFICANT PERFORMANCE DEGRADATION - just use `screen` directly
+// impl<DI, MODEL, RST, const W: u16, const H: u16> DrawTarget for LcdDisplay<DI, MODEL, RST, W, H>
+// where
+//     DI: WriteOnlyDataCommand,
+//     MODEL: DisplayModel,
+//     RST: OutputPinType,
+// {
+//     type Color = MODEL::ColorFormat;
+//     type Error = DisplayError;
 
-    /// Draw all pixels from an iterator onto the screen.
-    ///
-    /// # Note
-    ///
-    /// It appears that the implementation of a private trait of `DrawBatch` has a
-    /// significant effect on the performance of this function; however we can't
-    /// implement it on [`LcdDisplay`] because the trait is not exposed.
-    ///
-    /// Therefore using [`LcdDisplay`] directly as a [`DrawTarget`] is not recommended;
-    /// simply use the publicly accessible [`LcdDisplay::display`] field instead.
-    fn draw_iter<I>(&mut self, pixels: I) -> Result<(), Self::Error>
-    where
-        I: IntoIterator<Item = embedded_graphics::prelude::Pixel<Self::Color>>,
-    {
-        if cfg!(feature = "debug") {
-            #[cfg(feature = "debug")]
-            let start_time = Instant::now();
+//     /// Draw all pixels from an iterator onto the screen.
+//     ///
+//     /// # Note
+//     ///
+//     /// It appears that the implementation of a private trait of `DrawBatch` has a
+//     /// significant effect on the performance of this function; however we can't
+//     /// implement it on [`LcdDisplay`] because the trait is not exposed.
+//     ///
+//     /// Therefore using [`LcdDisplay`] directly as a [`DrawTarget`] is not recommended;
+//     /// simply use the publicly accessible [`LcdDisplay::display`] field instead.
+//     fn draw_iter<I>(&mut self, pixels: I) -> Result<(), Self::Error>
+//     where
+//         I: IntoIterator<Item = embedded_graphics::prelude::Pixel<Self::Color>>,
+//     {
+//         if cfg!(feature = "debug") {
+//             #[cfg(feature = "debug")]
+//             let start_time = Instant::now();
 
-            let result = self.display.draw_iter(pixels);
+//             let result = self.screen.draw_iter(pixels);
 
-            #[cfg(feature = "debug")]
-            logger::trace(&format!(
-                "Drawing to LcdDisplay took {}ms.",
-                start_time.elapsed().as_millis()
-            ));
+//             #[cfg(feature = "debug")]
+//             logger::trace(&format!(
+//                 "Drawing to LcdDisplay took {}ms.",
+//                 start_time.elapsed().as_millis()
+//             ));
 
-            result
-        } else {
-            self.display.draw_iter(pixels)
-        }
-    }
-}
+//             result
+//         } else {
+//             self.screen.draw_iter(pixels)
+//         }
+//     }
+// }
 
 macro_rules! expand_preset_models {
     ($((
@@ -100,7 +102,7 @@ macro_rules! expand_preset_models {
                     #[cfg(feature = "debug")]
                     logger::info(&format!("Creating new {}x{} {} LcdDisplay...", W, H, $name));
 
-                    let mut display =
+                    let mut screen =
                         RawDisplayBuilder::with_model(di, $model)
                         // width and height are switched on purpose because of the orientation
                         .with_display_size(H, W)
@@ -111,14 +113,14 @@ macro_rules! expand_preset_models {
                     ;
 
                     if tearing_effect != TearingEffect::Off {
-                        display.set_tearing_effect(tearing_effect)
+                        screen.set_tearing_effect(tearing_effect)
                             .into_rpi_result()?;
                     }
 
                     Ok(Self {
                         _delay: delay,
                         backlight,
-                        display,
+                        screen,
                     })
                 }
             }

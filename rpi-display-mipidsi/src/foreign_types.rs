@@ -2,7 +2,7 @@
 //!
 //! This module contains types that are not defined in this library, but are used
 //! by it. This reduces code duplication between the different modules.
-pub(crate) use display_interface::{DataFormat, DisplayError, WriteOnlyDataCommand};
+pub(crate) use display_interface::{DataFormat, WriteOnlyDataCommand};
 pub(crate) use display_interface_spi::SPIInterfaceNoCS;
 pub(crate) use embedded_graphics::geometry::Dimensions;
 pub(crate) use embedded_graphics::image::{Image, ImageRaw};

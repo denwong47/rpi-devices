@@ -21,6 +21,6 @@ where
     where
         T: ImageDrawable<Color = MODEL::ColorFormat>,
     {
-        image.draw(&mut self.display).into_rpi_result()
+        image.draw(&mut self.screen).into_rpi_result()
     }
 }

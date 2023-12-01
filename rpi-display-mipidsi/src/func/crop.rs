@@ -5,7 +5,7 @@ use crate::foreign_types::*;
 use crate::{pixelcolor::PixelColor, primitives, ImageDrawableExt, Point, Size, SubImage};
 
 /// Create an [`SubImage`] from an [`ImageRaw`], at the given position and size.
-pub fn crop_raw<'a, COLOUR, T>(raw: &'a T, x: i32, y: i32, w: u32, h: u32) -> SubImage<'a, T>
+pub fn crop_raw<COLOUR, T>(raw: &T, x: i32, y: i32, w: u32, h: u32) -> SubImage<'_, T>
 where
     COLOUR: PixelColor + From<<COLOUR as PixelColor>::Raw>,
     T: ImageDrawable<Color = COLOUR>,
@@ -17,7 +17,7 @@ where
 }
 
 /// Create an [`SubImage`] from an [`ImageRaw`], within the given bounding box.
-pub fn crop_raw_to<'a, COLOUR, T>(raw: &'a T, x1: i32, y1: i32, x2: i32, y2: i32) -> SubImage<'a, T>
+pub fn crop_raw_to<COLOUR, T>(raw: &T, x1: i32, y1: i32, x2: i32, y2: i32) -> SubImage<'_, T>
 where
     COLOUR: PixelColor + From<<COLOUR as PixelColor>::Raw>,
     T: ImageDrawable<Color = COLOUR>,
@@ -31,7 +31,7 @@ where
 
 /// Create an [`SubImage`] from an [`ImageRaw`], cropping away the left and
 /// right part of the image from the given X coordinate.
-pub fn crop_horizontal<'a, COLOUR, T>(raw: &'a T, at: i32, width: u32) -> SubImage<'a, T>
+pub fn crop_horizontal<COLOUR, T>(raw: &T, at: i32, width: u32) -> SubImage<'_, T>
 where
     COLOUR: PixelColor + From<<COLOUR as PixelColor>::Raw>,
     T: ImageDrawable<Color = COLOUR>,
@@ -52,7 +52,7 @@ where
 
 /// Create an [`SubImage`] from an [`ImageRaw`], cropping away the top and
 /// bottom part of the image from the given Y coordinate.
-pub fn crop_vertical<'a, COLOUR, T>(raw: &'a T, at: i32, height: u32) -> SubImage<'a, T>
+pub fn crop_vertical<COLOUR, T>(raw: &T, at: i32, height: u32) -> SubImage<'_, T>
 where
     COLOUR: PixelColor + From<<COLOUR as PixelColor>::Raw>,
     T: ImageDrawable<Color = COLOUR>,

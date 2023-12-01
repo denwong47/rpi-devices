@@ -8,7 +8,9 @@ where
 {
     /// Clears the display.
     pub fn fill(&mut self, colour: MODEL::ColorFormat) -> RPiResult<()> {
-        self.clear(colour).map_err(|_| RPiError::DisplayOutputError)
+        self.screen
+            .clear(colour)
+            .map_err(|_| RPiError::DisplayOutputError)
     }
 }
 
