@@ -21,6 +21,8 @@ text = ["rpi-display-mipidsi/text"]
 plot = ["rpi-display-mipidsi/plot"]
 library = ["rpi-display-mipidsi/library"]
 simd = ["rpi-display-mipidsi/simd"]
+nightly = ["rpi-display-mipidsi/nightly"]
+transitions = ["rpi-display-mipidsi/transitions"]
 
 [dependencies]
 async-mutex = { version = "1.4.0", optional = true }

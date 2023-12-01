@@ -11,16 +11,6 @@ mod implementations;
 mod traits;
 pub use traits::IntoRPiResult;
 
-#[cfg(feature = "display")]
-mod display {
-    pub use mipidsi::error::InitError;
-}
-
-#[cfg(feature = "bmp")]
-mod bmp {
-    pub use tinybmp::ParseError;
-}
-
 /// Error type
 #[derive(Error, Debug)]
 pub enum RPiError<'e> {

@@ -303,6 +303,47 @@ mod pimoroni_display_hat_mini {
             .expect("Failed to transition backlight to dark.");
         display.fill_black().expect("Failed to fill display black.");
     }
+
+    #[tokio::test]
+    #[cfg(feature = "bmp")]
+    #[cfg(feature = "transitions")]
+    #[serial]
+    async fn physical_transverse_bmp() {
+        let unit = PimoroniDisplayHATMini::init().expect("Failed to initialize Display HAT Mini.");
+
+        let mut display = unit.display.lock().await;
+
+        display
+            .backlight
+            .set_value(1.)
+            .expect("Failed to set backlight value.");
+
+        let bytes = img_func::fs::read_bytes_from_file("tests/images/panorama.bmp")
+            .await
+            .expect("Failed to load bytes.");
+        let bmp = img_func::bmp::bmp_from_bytes::<pixelcolor::Rgb565>(bytes.as_slice())
+            .expect("Failed to load BMP.");
+
+        const STEPS: u32 = 200;
+        const TRANSVERE: u32 = 463;
+
+        let transition = img_func::transitions::transverse(0, 0, TRANSVERE, 0);
+        let mut frames = img_func::transitions::Transition::new_self(
+            &bmp,
+            transition,
+            STEPS,
+            Duration::from_secs(10),
+        );
+
+        frames
+            .draw_on_lcd(&mut display)
+            .await
+            .expect("Failed to draw frames.");
+        display
+            .backlight
+            .disable()
+            .expect("Failed to disable backlight.");
+    }
 }
 
 #[cfg(feature = "pimoroni-enviro-plus")]
