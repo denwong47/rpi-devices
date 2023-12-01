@@ -4,5 +4,10 @@
 mod base;
 pub use base::*;
 
+#[cfg(feature = "simd")]
+mod dissolve;
+#[cfg(feature = "simd")]
+pub use dissolve::*;
+
 mod transverse;
 pub use transverse::*;

@@ -266,7 +266,7 @@ checksum = "d855c9092b75232d45ce8d28a997e095ed5e171280b425934abf246d7512d669"
 dependencies = [
  "embedded-graphics 0.7.1",
  "heapless 0.7.16",
- "itertools",
+ "itertools 0.9.0",
 ]
 
 [[package]]
@@ -496,6 +496,15 @@ name = "itertools"
 version = "0.9.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "284f18f85651fe11e8a991b2adb42cb078325c996ed026d994719efcfca1d54b"
+dependencies = [
+ "either",
+]
+
+[[package]]
+name = "itertools"
+version = "0.12.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "25db6b064527c5d482d0423354fcd07a89a2dfe07b67892e62411946db7f07b0"
 dependencies = [
  "either",
 ]
@@ -798,7 +807,9 @@ dependencies = [
  "embedded-plots",
  "embedded-text",
  "gxhash",
+ "itertools 0.12.0",
  "mipidsi",
+ "rand",
  "rpi-errors",
  "rpi-gpio",
  "rpi-logger",
