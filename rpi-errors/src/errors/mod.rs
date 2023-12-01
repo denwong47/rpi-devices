@@ -24,6 +24,7 @@ mod bmp {
 /// Error type
 #[derive(Error, Debug)]
 pub enum RPiError<'e> {
+    /// Invalid input; first argument is the variable name, second argument is the input.
     #[error("Invalid input for {0}: {1}")]
     InvalidInput(Cow<'e, str>, Cow<'e, str>),
 

@@ -275,10 +275,7 @@ mod pimoroni_display_hat_mini {
         for step in 0..STEPS {
             let target_time = start_time + step_duration;
 
-            let sub_image = ImageDrawableExt::sub_image(
-                &bmp,
-                &primitives::Rectangle::new(Point::new(step as i32, 0), Size::new(320, 240)),
-            );
+            let sub_image = img_func::crop::crop_horizontal(&bmp, (step * 40 / STEPS) as i32, 320);
 
             let image = img_func::image_conversions::image_from_raw(&sub_image, 0, 0);
             display.draw_image(image).expect("Failed to draw image.");
