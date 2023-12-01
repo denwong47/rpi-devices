@@ -40,12 +40,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "async-iterator"
-version = "2.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f457e72b88b87c911a455c0f7b562c8e85d32d3ef4d41df156c4b8abf1777ae4"
-
-[[package]]
 name = "async-mutex"
 version = "1.4.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -788,7 +782,6 @@ dependencies = [
 name = "rpi-display-mipidsi"
 version = "0.1.0"
 dependencies = [
- "async-iterator",
  "async-mutex",
  "async-trait",
  "display-interface",

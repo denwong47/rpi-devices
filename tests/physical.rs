@@ -1,5 +1,10 @@
 //! These tests are only useful if you have the physical board attached to your device.
 //! They are ignored by default, but can be run using the feature that corresponds to the board.
+//!
+
+#[allow(unused_imports)]
+use std::ops::DerefMut;
+
 #[allow(unused_imports)]
 use rpi_devices::{
     display_mipidsi::{func as img_func, *},
@@ -327,18 +332,18 @@ mod pimoroni_display_hat_mini {
         const TRANSVERE: u32 = 463;
         const STEPS: u32 = TRANSVERE;
 
-        let transition = img_func::transitions::transverse(0, 0, TRANSVERE, 0);
-        let mut frames = img_func::transitions::Transition::new_self(
+        let transition = img_func::transitions::transverse(STEPS, 0, 0, TRANSVERE, 0);
+        img_func::transitions::Transition::new_self(
+            display.deref_mut(),
             &bmp,
             transition,
             STEPS,
             Duration::from_secs(22),
-        );
+        )
+        .start()
+        .await
+        .expect("Unable to transverse image.");
 
-        frames
-            .draw_on_lcd(&mut display)
-            .await
-            .expect("Failed to draw frames.");
         display
             .backlight
             .disable()
