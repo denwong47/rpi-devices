@@ -2,7 +2,7 @@
 //! They are ignored by default, but can be run using the feature that corresponds to the board.
 #[allow(unused_imports)]
 use rpi_devices::{
-    display_mipidsi::{func as img_func, pixelcolor, Image, ImageDrawable, ImageRaw, PixelColor},
+    display_mipidsi::{func as img_func, *},
     errors::{IntoRPiResult, RPiResult},
 };
 
@@ -252,6 +252,59 @@ mod pimoroni_display_hat_mini {
             display.fill_black().expect("Failed to fill display black.");
         }
         .await;
+    }
+
+    #[tokio::test]
+    #[cfg(feature = "bmp")]
+    #[serial]
+    async fn physical_display_bmp() {
+        let unit = PimoroniDisplayHATMini::init().expect("Failed to initialize Display HAT Mini.");
+
+        let mut display = unit.display.lock().await;
+
+        let bytes = img_func::fs::read_bytes_from_file("tests/images/travel.bmp")
+            .await
+            .expect("Failed to load bytes.");
+        let bmp = img_func::bmp::bmp_from_bytes::<pixelcolor::Rgb565>(bytes.as_slice())
+            .expect("Failed to load BMP.");
+
+        const STEPS: u32 = 40;
+        let mut start_time = tokio::time::Instant::now();
+        let step_duration = Duration::from_secs(6) / STEPS;
+
+        for step in 0..STEPS {
+            let target_time = start_time + step_duration;
+
+            let sub_image = ImageDrawableExt::sub_image(
+                &bmp,
+                &primitives::Rectangle::new(Point::new(step as i32, 0), Size::new(320, 240)),
+            );
+
+            let image = img_func::image_conversions::image_from_raw(&sub_image, 0, 0);
+            display.draw_image(image).expect("Failed to draw image.");
+
+            if step < 32 {
+                display
+                    .backlight
+                    .set_value(step as f64 / 32.)
+                    .expect("Failed to set backlight value.");
+            }
+
+            // TODO write the actual function in a way that just drops frames if we're too slow.
+            let frame_time = tokio::time::Instant::now() - start_time;
+            println!("Target duration: {step_duration:?}, Frame time: {frame_time:?}");
+            start_time = tokio::time::Instant::now();
+            tokio::time::sleep_until(target_time).await;
+        }
+
+        tokio::time::sleep(Duration::from_secs(2)).await;
+
+        display
+            .backlight
+            .transition_to(0., 32, Duration::from_secs(2))
+            .await
+            .expect("Failed to transition backlight to dark.");
+        display.fill_black().expect("Failed to fill display black.");
     }
 }
 

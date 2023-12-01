@@ -8,3 +8,6 @@ mod into_rpi_result;
 
 #[cfg(feature = "display")]
 mod display;
+
+#[cfg(feature = "bmp")]
+mod bmp;

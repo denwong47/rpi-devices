@@ -5,6 +5,7 @@
 pub(crate) use display_interface::{DataFormat, WriteOnlyDataCommand};
 pub(crate) use display_interface_spi::SPIInterfaceNoCS;
 pub(crate) use embedded_graphics::image::{Image, ImageRaw};
+pub(crate) use embedded_graphics::pixelcolor;
 pub(crate) use embedded_graphics::prelude::{
     DrawTarget, Drawable, ImageDrawable, IntoStorage, PixelColor, Point, RgbColor,
 };

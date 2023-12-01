@@ -11,7 +11,9 @@ pub use display_interface_spi::{
 pub use mipidsi::{ColorInversion, Orientation};
 
 pub use embedded_graphics::{
-    image::{Image, ImageRaw},
+    draw_target::{Clipped, ColorConverted, Cropped, DrawTarget, DrawTargetExt},
+    image::{Image, ImageRaw, SubImage},
     pixelcolor,
     prelude::*,
+    primitives,
 };

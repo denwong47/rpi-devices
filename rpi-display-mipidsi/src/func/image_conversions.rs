@@ -3,14 +3,10 @@
 use crate::foreign_types::*;
 
 /// Create an [`Image`] from an [`ImageRaw`], at the given position.
-pub fn image_from_raw<'a, COLOUR>(
-    raw: &'a ImageRaw<'a, COLOUR>,
-    x: i32,
-    y: i32,
-) -> Image<'a, ImageRaw<'a, COLOUR>>
+pub fn image_from_raw<'a, COLOUR, T>(raw: &'a T, x: i32, y: i32) -> Image<'a, T>
 where
     COLOUR: PixelColor + From<<COLOUR as PixelColor>::Raw>,
-    for<'i> ImageRaw<'i, COLOUR>: ImageDrawable,
+    T: ImageDrawable<Color = COLOUR>,
 {
     Image::new(raw, Point::new(x, y))
 }

@@ -16,6 +16,11 @@ mod display {
     pub use mipidsi::error::InitError;
 }
 
+#[cfg(feature = "bmp")]
+mod bmp {
+    pub use tinybmp::ParseError;
+}
+
 /// Error type
 #[derive(Error, Debug)]
 pub enum RPiError<'e> {
@@ -61,6 +66,10 @@ pub enum RPiError<'e> {
     #[cfg(feature = "display")]
     #[error("Display interface reported an error: {0}")]
     DisplayInterfaceError(Cow<'e, str>),
+
+    #[cfg(feature = "bmp")]
+    #[error("Failed to parse BMP image: {0}")]
+    BMPError(Cow<'e, str>),
 }
 
 /// Result type with the error being [`RPiError`].

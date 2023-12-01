@@ -784,6 +784,7 @@ dependencies = [
  "mipidsi",
  "rppal",
  "thiserror",
+ "tinybmp",
  "tokio",
 ]
 
