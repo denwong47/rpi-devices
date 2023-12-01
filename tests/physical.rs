@@ -232,6 +232,7 @@ mod pimoroni_display_hat_mini {
 
     #[tokio::test]
     #[serial]
+    #[cfg(feature = "transitions")]
     async fn physical_display_images() {
         let unit = PimoroniDisplayHATMini::init().expect("Failed to initialize Display HAT Mini.");
 
@@ -239,14 +240,17 @@ mod pimoroni_display_hat_mini {
             let mut display = unit.display.lock().await;
             let bytes_array = load_bytes().await.expect("Failed to load bytes.");
             let raws = load_raw::<pixelcolor::Rgb565, 320>(&bytes_array);
-            let images = load_images::<pixelcolor::Rgb565, 320>(&raws);
 
             display.fill_black().expect("Failed to fill display black.");
 
-            for (id, image) in images.into_iter().enumerate() {
-                display.draw_image(image).expect("Failed to draw image.");
+            const STEPS: u32 = 40;
 
+            for (id, raw) in raws.into_iter().enumerate() {
                 if id == 0 {
+                    display
+                        .draw_image(img_func::image_conversions::image_from_raw(&raw, 0, 0))
+                        .expect("Failed to draw image.");
+
                     // For the first image, once we have loaded the image to the screen, we
                     // fade in.
                     display
@@ -254,6 +258,22 @@ mod pimoroni_display_hat_mini {
                         .transition_to(1., 32, Duration::from_secs(2))
                         .await
                         .expect("Failed to transition backlight to full power.");
+                } else {
+                    let sweeper = img_func::transitions::sweep(
+                        40,
+                        img_func::transitions::SweepDirection::FromLeft,
+                    );
+
+                    img_func::transitions::Transition::new_self(
+                        &mut display.screen,
+                        &raw,
+                        sweeper,
+                        STEPS,
+                        Duration::from_secs(2),
+                    )
+                    .start()
+                    .await
+                    .expect("Failed to transition image.");
                 }
                 tokio::time::sleep(Duration::from_secs(1)).await;
             }
@@ -301,7 +321,6 @@ mod pimoroni_display_hat_mini {
                     .expect("Failed to set backlight value.");
             }
 
-            // TODO write the actual function in a way that just drops frames if we're too slow.
             let frame_time = tokio::time::Instant::now() - start_time;
             logger::debug(&format!(
                 "Target duration: {step_duration:?}, Frame time: {frame_time:?}"

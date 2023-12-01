@@ -2,7 +2,7 @@
 //!
 
 use crate::foreign_types::*;
-use crate::{pixelcolor::PixelColor, primitives, ImageDrawableExt, Point, Size, SubImage};
+use crate::{func, pixelcolor::PixelColor, primitives, ImageDrawableExt, Point, Size, SubImage};
 
 /// Create an [`SubImage`] from an [`ImageRaw`], at the given position and size.
 pub fn crop_raw<COLOUR, T>(raw: &T, x: i32, y: i32, w: u32, h: u32) -> SubImage<'_, T>
@@ -69,4 +69,27 @@ where
         w,
         (h as i32 - at).min(height as i32).max(0) as u32,
     )
+}
+
+/// Create an [`Image`] from an [`ImageDrawable`] by cropping it, and offsetting
+/// it to keep it in the same position as the original image.
+pub fn draw_cropped_in_place<'e, COLOUR, T, DT>(
+    target: &mut DT,
+    raw: &T,
+    x1: i32,
+    y1: i32,
+    x2: i32,
+    y2: i32,
+) -> RPiResult<'e, ()>
+where
+    COLOUR: PixelColor + From<<COLOUR as PixelColor>::Raw>,
+    T: ImageDrawable<Color = COLOUR>,
+    DT: DrawTarget<Color = COLOUR>,
+    DT::Error: Into<RPiError<'e>>,
+{
+    let cropped = crop_raw_to(raw, x1, y1, x2, y2);
+
+    func::image_conversions::image_from_raw(&cropped, x1, y1)
+        .draw(target)
+        .into_rpi_result()
 }

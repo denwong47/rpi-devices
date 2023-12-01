@@ -106,7 +106,7 @@ where
 
             // The second check is necessary to confirm that we have at least issued the
             // last step of the transition once.
-            if step >= self.steps && self.step >= self.steps {
+            if step > self.steps && self.step > self.steps {
                 #[cfg(feature = "debug")]
                 {
                     let rendered_count = self.step - self.skipped_count;
