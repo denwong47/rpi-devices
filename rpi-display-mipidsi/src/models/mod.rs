@@ -9,3 +9,5 @@ mod library;
 pub use library::*;
 
 pub mod panels;
+
+pub mod traits;

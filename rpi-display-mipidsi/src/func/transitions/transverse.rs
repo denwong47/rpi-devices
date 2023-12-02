@@ -1,7 +1,7 @@
 //! Move the entire image by the given amount of pixels.
 //!
 
-use super::traits::DrawTransition;
+use crate::traits::DrawTransition;
 use crate::{foreign_types::*, func};
 
 /// Move the entire image by the given amount of pixels.

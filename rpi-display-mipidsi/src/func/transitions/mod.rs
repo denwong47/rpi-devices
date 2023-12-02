@@ -10,4 +10,4 @@ pub use sweep::*;
 mod transverse;
 pub use transverse::*;
 
-pub mod traits;
+pub use crate::traits::DrawTransition;

@@ -5,7 +5,7 @@ use crate::foreign_types::*;
 use std::{sync::OnceLock, time::Duration};
 use tokio::time::Instant;
 
-use super::traits::DrawTransition;
+use crate::traits::DrawTransition;
 
 /// Transition between two images.
 pub struct Transition<'a, COLOUR, T1, T2, F, DT>

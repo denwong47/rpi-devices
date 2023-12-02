@@ -1,6 +1,6 @@
 //! Sweep an image to transition over to another image.
 
-use super::traits::DrawTransition;
+use crate::traits::DrawTransition;
 use crate::{foreign_types::*, func};
 
 /// The direction to sweep the image.
