@@ -237,24 +237,22 @@ mod pimoroni_display_hat_mini {
         let unit = PimoroniDisplayHATMini::init().expect("Failed to initialize Display HAT Mini.");
 
         async {
-            let mut display = unit.display.lock().await;
+            let mut lcd = unit.display.lock().await;
             let bytes_array = load_bytes().await.expect("Failed to load bytes.");
             let raws = load_raw::<pixelcolor::Rgb565, 320>(&bytes_array);
 
-            display.fill_black().expect("Failed to fill display black.");
+            lcd.fill_black().expect("Failed to fill display black.");
 
             const STEPS: u32 = 40;
 
             for (id, raw) in raws.into_iter().enumerate() {
                 if id == 0 {
-                    display
-                        .draw_image(img_func::image_conversions::image_from_raw(&raw, 0, 0))
+                    lcd.draw_image(img_func::image_conversions::image_from_raw(&raw, 0, 0))
                         .expect("Failed to draw image.");
 
                     // For the first image, once we have loaded the image to the screen, we
                     // fade in.
-                    display
-                        .backlight
+                    lcd.backlight
                         .transition_to(1., 32, Duration::from_secs(2))
                         .await
                         .expect("Failed to transition backlight to full power.");
@@ -264,26 +262,18 @@ mod pimoroni_display_hat_mini {
                         img_func::transitions::SweepDirection::FromLeft,
                     );
 
-                    img_func::transitions::Transition::new_self(
-                        &mut display.screen,
-                        &raw,
-                        sweeper,
-                        STEPS,
-                        Duration::from_secs(2),
-                    )
-                    .start()
-                    .await
-                    .expect("Failed to transition image.");
+                    lcd.draw_transition_to(&raw, sweeper, STEPS, Duration::from_secs(2))
+                        .await
+                        .expect("Failed to transition image.");
                 }
                 tokio::time::sleep(Duration::from_secs(1)).await;
             }
 
-            display
-                .backlight
+            lcd.backlight
                 .transition_to(0., 32, Duration::from_secs(2))
                 .await
                 .expect("Failed to transition backlight to dark.");
-            display.fill_black().expect("Failed to fill display black.");
+            lcd.fill_black().expect("Failed to fill display black.");
         }
         .await;
     }

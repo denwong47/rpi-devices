@@ -11,10 +11,34 @@ where
     RST: OutputPinType,
     MODEL::ColorFormat: From<<MODEL::ColorFormat as PixelColor>::Raw>,
 {
-    /// Draw a already defined text box on the display.
-    pub async fn transition_to<'a, 'e, T, F>(
+    /// Transition from one image to another using the supplied
+    /// [`DrawTransition`], and the given steps and duration.
+    pub async fn draw_transition<'a, 'e, T1, T2, F>(
         &'a mut self,
-        target: &'e T,
+        from: &'e T1,
+        to: &'e T2,
+        transition: F,
+        steps: u32,
+        duration: Duration,
+    ) -> RPiResult<'e, ()>
+    where
+        'a: 'e,
+        MODEL::ColorFormat: Default,
+        T1: ImageDrawable<Color = MODEL::ColorFormat> + 'e,
+        T2: ImageDrawable<Color = MODEL::ColorFormat> + 'e,
+        F: DrawTransition<'e, MODEL::ColorFormat, T1, T2, mipidsi::Display<DI, MODEL, RST>>,
+    {
+        let mut handler =
+            transitions::Transition::new(&mut self.screen, from, to, transition, steps, duration);
+
+        handler.start().await
+    }
+
+    /// Transition to a new image using the supplied [`DrawTransition`], and the
+    /// given steps and duration.
+    pub async fn draw_transition_to<'a, 'e, T, F>(
+        &'a mut self,
+        frame: &'e T,
         transition: F,
         steps: u32,
         duration: Duration,
@@ -25,15 +49,7 @@ where
         T: ImageDrawable<Color = MODEL::ColorFormat> + 'e,
         F: DrawTransition<'e, MODEL::ColorFormat, T, T, mipidsi::Display<DI, MODEL, RST>>,
     {
-        let mut handler = transitions::Transition::new(
-            &mut self.screen,
-            target,
-            target,
-            transition,
-            steps,
-            duration,
-        );
-
-        handler.start().await
+        self.draw_transition(frame, frame, transition, steps, duration)
+            .await
     }
 }
