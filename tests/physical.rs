@@ -422,6 +422,25 @@ mod pimoroni_display_hat_mini {
         \x1b[94m-\x1b[37m VSYNC Interface
         ".to_owned();
 
+        lcd.fill_blue().expect("Failed to fill display blue.");
+        lcd.draw_title::<20>(
+            "\x1b[97mST7789\x1b[33m | LCD Display",
+            pixelcolor::Rgb565::WHITE,
+            Some(Point::new(0, 120 - 10)),
+            None,
+        )
+        .expect("Failed to draw title.");
+        lcd.backlight
+            .transition_to(1., STEPS, Duration::from_secs_f32(0.3))
+            .await
+            .expect("Failed to enable backlight.");
+
+        tokio::time::sleep(Duration::from_secs(4)).await;
+        lcd.backlight
+            .transition_to(0., STEPS, Duration::from_secs_f32(0.3))
+            .await
+            .expect("Failed to disable backlight.");
+
         const STEPS: u32 = 12;
         loop {
             lcd.fill_black().expect("Failed to fill display black.");
@@ -448,14 +467,14 @@ mod pimoroni_display_hat_mini {
                 .await
                 .expect("Failed to enable backlight.");
 
-            tokio::time::sleep(Duration::from_secs(6)).await;
+            tokio::time::sleep(Duration::from_secs(4)).await;
+            lcd.backlight
+                .transition_to(0., STEPS, Duration::from_secs_f32(0.3))
+                .await
+                .expect("Failed to disable backlight.");
+
             if text.len() == 0 {
                 break;
-            } else {
-                lcd.backlight
-                    .transition_to(0., STEPS, Duration::from_secs_f32(0.3))
-                    .await
-                    .expect("Failed to disable backlight.");
             }
         }
     }

@@ -113,4 +113,30 @@ where
             size,
         )
     }
+
+    /// Draw a piece of ANSI capable text at the centre of the bounding box.
+    pub fn draw_title<'e, 't, const FS: u8>(
+        &mut self,
+        text: &'t str,
+        colour: MODEL::ColorFormat,
+        position: Option<Point>,
+        size: Option<Size>,
+    ) -> RPiResult<'e, String>
+    where
+        DefaultStyle<FS>: ValidStyle,
+        MODEL::ColorFormat: Default + From<pixelcolor::Rgb888>,
+    {
+        self.draw_ansi_text(
+            text,
+            DefaultStyle::<FS>::default_style(colour),
+            TextBoxStyleBuilder::new()
+                .vertical_alignment(VerticalAlignment::Middle)
+                .alignment(HorizontalAlignment::Center)
+                .height_mode(HeightMode::FitToText)
+                .trailing_spaces(false)
+                .build(),
+            position,
+            size,
+        )
+    }
 }
