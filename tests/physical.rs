@@ -377,6 +377,88 @@ mod pimoroni_display_hat_mini {
             .disable()
             .expect("Failed to disable backlight.");
     }
+
+    #[tokio::test]
+    #[cfg(feature = "text")]
+    #[serial]
+    async fn physical_draw_text() {
+        let unit = PimoroniDisplayHATMini::init().expect("Failed to initialize Display HAT Mini.");
+
+        let mut lcd = unit.display.lock().await;
+
+        const MARGIN: i32 = 16;
+
+        let mut text = "The \x1b[36mST7789VW\x1b[37m is a \x1b[4msingle-chip \
+        controller/driver\x1b[24m for \x1b[94m262K-color\x1b[37m, graphic type TFT-LCD. \
+        It consists of 720 source line and 320 gate line driving circuits.\n\n\
+        This chip is capable of connecting \
+        directly to an external microprocessor, and accepts, \
+        \x1b[4m8-bits/9-bits/16-bits/18-bits\x1b[24m \
+        parallel interface. Display data can be stored in the on-chip display data RAM of \
+        \x1b[97m240x320x18 bits.\x1b[37m\n\n\
+        It can perform display data RAM read/write operation with no external operation \
+        clock to minimize power consumption. In addition, because of the integrated \
+        power supply circuit necessary to drive liquid crystal; \
+        it is possible to make a display system with the fewest components.\n\n\
+        \x1b[46mFEATURES\x1b[49m\n\n\
+        \x1b[96m* Single chip TFT-LCD Controller/Driver with On-chip Frame Memory (FM)\x1b[37m\n\
+        \x1b[96m* Display Resolution: 240*RGB (H) *320(V)\x1b[37m\n\
+        \x1b[96m* Frame Memory Size: 240 x 320 x 18-bit = 1,382,400 bits\x1b[37m\n\
+        \x1b[96m* LCD Driver Output Circuits\x1b[37m\n\
+        \x1b[94m-\x1b[37m Source Outputs: 240 RGB Channels\n\
+        \x1b[94m-\x1b[37m Gate Outputs: 320 Channels\n\
+        \x1b[94m-\x1b[37m Common Electrode Output\n\
+        \x1b[96m* Display Colors (Color Mode)\x1b[37m\n\
+        \x1b[94m-\x1b[37m Full Color: 262K, RGB=(666) max., Idle Mode Off\n\
+        \x1b[94m-\x1b[37m Color Reduce: 8-color, RGB=(111), Idle Mode On\n\
+        \x1b[96m* Programmable Pixel Color Format (Color Depth) for Various Display Data input Format\x1b[37m\n\
+        \x1b[94m-\x1b[37m 12-bit/pixel: RGB=(444)\n\
+        \x1b[94m-\x1b[37m 16-bit/pixel: RGB=(565)\n\
+        \x1b[94m-\x1b[37m 18-bit/pixel: RGB=(666)\n\
+        \x1b[96m* MCU Interface\x1b[37m\n\
+        \x1b[94m-\x1b[37m Parallel 8080-series MCU Interface (8-bit, 9-bit, 16-bit & 18-bit)\n\
+        \x1b[94m-\x1b[37m 6/16/18 RGB Interface(VSYNC, HSYNC, DOTCLK, ENABLE, DB[17:0])\n\
+        \x1b[94m-\x1b[37m Serial Peripheral Interface(SPI Interface)\n\
+        \x1b[94m-\x1b[37m VSYNC Interface
+        ".to_owned();
+
+        const STEPS: u32 = 12;
+        loop {
+            lcd.fill_black().expect("Failed to fill display black.");
+
+            lcd.draw_text::<20>(
+                "ST7789VW",
+                pixelcolor::Rgb565::CYAN,
+                Some(Point::new(MARGIN, MARGIN)),
+                None,
+            )
+            .expect("Failed to draw text.");
+
+            text = lcd
+                .draw_text::<15>(
+                    &text,
+                    pixelcolor::Rgb565::WHITE,
+                    Some(Point::new(MARGIN, MARGIN + 20 + 4)),
+                    None,
+                )
+                .expect("Failed to draw text.");
+
+            lcd.backlight
+                .transition_to(1., STEPS, Duration::from_secs_f32(0.3))
+                .await
+                .expect("Failed to enable backlight.");
+
+            tokio::time::sleep(Duration::from_secs(6)).await;
+            if text.len() == 0 {
+                break;
+            } else {
+                lcd.backlight
+                    .transition_to(0., STEPS, Duration::from_secs_f32(0.3))
+                    .await
+                    .expect("Failed to disable backlight.");
+            }
+        }
+    }
 }
 
 #[cfg(feature = "pimoroni-enviro-plus")]

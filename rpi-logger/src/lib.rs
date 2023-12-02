@@ -46,7 +46,7 @@ impl LogLevel {
     /// Return the suffix for this level.
     pub fn suffix(&self) -> &'static str {
         match self {
-            Self::Trace => "\u{1b}[1K\u{1b}[1A",
+            // Self::Trace => "\u{1b}[1K\u{1b}[1A",
             _ => "",
         }
     }

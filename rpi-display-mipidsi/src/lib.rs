@@ -3,6 +3,9 @@ pub mod func;
 mod models;
 pub use models::*;
 
+#[cfg(feature = "text")]
+pub use models::text;
+
 pub(crate) mod foreign_types;
 
 pub use display_interface_spi::{

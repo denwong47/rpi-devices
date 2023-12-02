@@ -71,7 +71,7 @@ where
         };
 
         #[cfg(feature = "debug")]
-        logger::debug(&format!(
+        logger::trace(&format!(
             "Sweeping {} step: {}, offset: {:?}, size: {:?}",
             direction.direction(),
             step,

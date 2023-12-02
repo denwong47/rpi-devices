@@ -2,4 +2,7 @@ mod clear;
 mod images;
 
 #[cfg(feature = "text")]
-mod text;
+pub mod text;
+
+#[cfg(feature = "transitions")]
+pub mod transition;
