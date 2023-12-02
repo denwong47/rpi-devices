@@ -10,7 +10,7 @@ pub(crate) use embedded_graphics::pixelcolor;
 pub(crate) use embedded_graphics::prelude::{
     DrawTarget, Drawable, ImageDrawable, IntoStorage, PixelColor, Point, RgbColor,
 };
-pub(crate) use embedded_graphics::primitives;
+pub(crate) use embedded_graphics::primitives::{self, Primitive, PrimitiveStyle};
 pub(crate) use embedded_hal::blocking::delay::DelayUs; // Watch out for this guy - v1.0.0 inbound
 pub(crate) use mipidsi::{
     dcs::{self, Dcs},

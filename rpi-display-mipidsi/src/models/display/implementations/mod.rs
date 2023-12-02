@@ -1,4 +1,5 @@
 mod clear;
+mod geometries;
 mod images;
 
 #[cfg(feature = "text")]
