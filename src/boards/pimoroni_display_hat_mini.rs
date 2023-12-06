@@ -1,11 +1,13 @@
 //! Pimoroni Display HAT Mini on a Raspberry Pi.
 //!
 
+use crate::display_mipidsi::LcdST7789;
+use crate::display_mipidsi::{
+    traits::DisplayComponent, ColorInversion, DisplaySPIInterfaceNoCS, Orientation, TearingEffect,
+};
+use crate::errors::{IntoRPiResult, RPiResult};
+use crate::gpio::{func, traits::HardwareComponent, Button, DisplayBacklight, OutputPin, RgbLed};
 use async_mutex::Mutex;
-use rpi_display_mipidsi::LcdST7789;
-use rpi_display_mipidsi::{ColorInversion, DisplaySPIInterfaceNoCS, Orientation, TearingEffect};
-use rpi_errors::{IntoRPiResult, RPiResult};
-use rpi_gpio::{func, Button, DisplayBacklight, RgbLed};
 use rppal::{
     hal::Delay,
     spi::{Bus, Mode as SpiMode, SlaveSelect, Spi},
@@ -107,4 +109,15 @@ impl PimoroniDisplayHATMini {
             .into(),
         })
     }
+}
+
+/// Marker trait only.
+impl HardwareComponent for PimoroniDisplayHATMini {}
+
+/// Mark the [`PimoroniDisplayHATMini`] as a [`DisplayComponent`].
+impl DisplayComponent<320, 240> for PimoroniDisplayHATMini {
+    type COLOUR = crate::display_mipidsi::pixelcolor::Rgb565;
+    type DI = DisplaySPIInterfaceNoCS<Spi, OutputPin>;
+    type MODEL = crate::display_mipidsi::screen_models::ST7789;
+    type RST = OutputPin;
 }

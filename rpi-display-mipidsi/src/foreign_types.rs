@@ -4,8 +4,12 @@
 //! by it. This reduces code duplication between the different modules.
 pub(crate) use display_interface::{DataFormat, WriteOnlyDataCommand};
 pub(crate) use display_interface_spi::SPIInterfaceNoCS;
-pub(crate) use embedded_graphics::geometry::{Dimensions, OriginDimensions, Size};
+pub(crate) use embedded_graphics::geometry::Dimensions;
+#[cfg(feature = "text")]
+pub(crate) use embedded_graphics::geometry::{OriginDimensions, Size};
 pub(crate) use embedded_graphics::image::{Image, ImageRaw};
+
+#[cfg(any(feature = "text", feature = "bmp"))]
 pub(crate) use embedded_graphics::pixelcolor;
 pub(crate) use embedded_graphics::prelude::{
     DrawTarget, Drawable, ImageDrawable, IntoStorage, PixelColor, Point, RgbColor,

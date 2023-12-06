@@ -2,10 +2,10 @@
 //!
 
 use async_mutex::Mutex;
-use rpi_display_mipidsi::LcdST7735;
+use rpi_display_mipidsi::{traits::DisplayComponent, LcdST7735};
 use rpi_display_mipidsi::{ColorInversion, DisplaySPIInterfaceNoCS, Orientation, TearingEffect};
 use rpi_errors::{IntoRPiResult, RPiResult};
-use rpi_gpio::{func, DisplayBacklight};
+use rpi_gpio::{func, traits::HardwareComponent, DisplayBacklight, OutputPin};
 use rppal::{
     hal::Delay,
     spi::{Bus, Mode as SpiMode, SlaveSelect, Spi},
@@ -101,4 +101,15 @@ impl PimoroniEnviroPlus {
             .into(),
         })
     }
+}
+
+/// Marker trait only.
+impl HardwareComponent for PimoroniEnviroPlus {}
+
+/// Mark the [`PimoroniDisplayHATMini`] as a [`DisplayComponent`].
+impl DisplayComponent<160, 80> for PimoroniEnviroPlus {
+    type COLOUR = crate::display_mipidsi::pixelcolor::Rgb565;
+    type DI = DisplaySPIInterfaceNoCS<Spi, OutputPin>;
+    type MODEL = crate::display_mipidsi::screen_models::ST7789;
+    type RST = OutputPin;
 }

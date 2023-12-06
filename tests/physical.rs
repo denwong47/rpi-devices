@@ -77,9 +77,7 @@ mod pimoroni_display_hat_mini {
     async fn physical_press() {
         let gpio = func::init_gpio().unwrap();
 
-        logger::debug(&format!(
-            "\x1b[38;5;11mPress a button on the Pimoroni Display HAT Mini...\x1b[39m"
-        ));
+        logger::debug("\x1b[38;5;11mPress a button on the Pimoroni Display HAT Mini...\x1b[39m");
         macro_rules! expand_buttons {
             ($((
                 $name:ident,
@@ -147,7 +145,7 @@ mod pimoroni_display_hat_mini {
 
         let rgbs = [(0, 0, 32), (0, 0, 128), (192, 0, 128), (192, 192, 0)];
 
-        for slice in rgbs.windows(2).into_iter() {
+        for slice in rgbs.windows(2) {
             let from = slice[0];
             let to = slice[1];
 
@@ -166,29 +164,21 @@ mod pimoroni_display_hat_mini {
         let mut backlight =
             DisplayBacklight::new(&gpio, PimoroniDisplayHATMini::DISPLAY_BACKLIGHT, 50.);
 
-        logger::debug(&format!(
-            "\x1b[38;5;11mTransitioning the backlight from OFF to 100%...\x1b[39m"
-        ));
+        logger::debug("\x1b[38;5;11mTransitioning the backlight from OFF to 100%...\x1b[39m");
         backlight
             .transition_to(1.0, 32, Duration::from_secs(2))
             .await
             .expect("Failed to transition to 1.0");
 
-        logger::debug(&format!(
-            "\x1b[38;5;11mDisabling the backlight for 1s...\x1b[39m"
-        ));
+        logger::debug("\x1b[38;5;11mDisabling the backlight for 1s...\x1b[39m");
         backlight.disable().expect("Failed to disable");
         tokio::time::sleep(Duration::from_secs(1)).await;
 
-        logger::debug(&format!(
-            "\x1b[38;5;11mRe-enabling the backlight for 1s...\x1b[39m"
-        ));
+        logger::debug("\x1b[38;5;11mRe-enabling the backlight for 1s...\x1b[39m");
         backlight.enable().expect("Failed to enable");
         tokio::time::sleep(Duration::from_secs(1)).await;
 
-        logger::debug(&format!(
-            "\x1b[38;5;11mTransitioning the backlight from 100% to OFF...\x1b[39m"
-        ));
+        logger::debug("\x1b[38;5;11mTransitioning the backlight from 100% to OFF...\x1b[39m");
         backlight
             .transition_to(0., 32, Duration::from_secs(2))
             .await
@@ -463,7 +453,7 @@ mod pimoroni_display_hat_mini {
                 .await
                 .expect("Failed to disable backlight.");
 
-            if text.len() == 0 {
+            if text.is_empty() {
                 break;
             }
         }
