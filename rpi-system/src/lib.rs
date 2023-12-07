@@ -9,13 +9,13 @@ use std::sync::{Arc, OnceLock};
 pub use rppal::system::{DeviceInfo, Error as SystemError, Model, SoC};
 
 /// A static reference to the [`DeviceInfo`] struct for the current device.
-const DEVICE_INFO: OnceLock<Result<Arc<DeviceInfo>, SystemError>> = OnceLock::new();
+static DEVICE_INFO: OnceLock<Result<Arc<DeviceInfo>, SystemError>> = OnceLock::new();
 
 /// A static reference to the [`Model`] enum for the current device.
-const MODEL: OnceLock<Result<Arc<Model>, SystemError>> = OnceLock::new();
+static MODEL: OnceLock<Result<Arc<Model>, SystemError>> = OnceLock::new();
 
 /// A static reference to the [`SoC`] enum for the current device.
-const SOC: OnceLock<Result<Arc<SoC>, SystemError>> = OnceLock::new();
+static SOC: OnceLock<Result<Arc<SoC>, SystemError>> = OnceLock::new();
 
 /// Helper function to get a static reference to a [`OnceLock`].
 fn get_static<'e, T, F>(

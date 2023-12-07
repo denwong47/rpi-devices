@@ -3,8 +3,6 @@
 #[cfg(feature = "jsonl_logging")]
 use serde_json;
 
-use time;
-
 mod config;
 
 /// An enum for different log levels that appears differently.
@@ -45,10 +43,11 @@ impl LogLevel {
 
     /// Return the suffix for this level.
     pub fn suffix(&self) -> &'static str {
-        match self {
-            // Self::Trace => "\u{1b}[1K\u{1b}[1A",
-            _ => "",
-        }
+        // match self {
+        //     Self::Trace => "\u{1b}[1K\u{1b}[1A",
+        //     _ => "",
+        // }
+        ""
     }
 
     /// Wraps the string in the corresponding colour.
