@@ -11,7 +11,12 @@ pub(crate) mod foreign_types;
 pub use display_interface_spi::{
     SPIInterface as DisplaySPIInterface, SPIInterfaceNoCS as DisplaySPIInterfaceNoCS,
 };
-pub use mipidsi::{models as screen_models, ColorInversion, Orientation, TearingEffect};
+pub use mipidsi::{ColorInversion, Orientation, TearingEffect};
+
+pub mod screen_models {
+    pub use super::panels::ST7735;
+    pub use mipidsi::models::*;
+}
 
 pub use embedded_graphics::{
     draw_target::{Clipped, ColorConverted, Cropped, DrawTarget, DrawTargetExt},

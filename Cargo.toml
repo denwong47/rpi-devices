@@ -11,6 +11,11 @@ name = "colour-on-press"
 path = "./examples/colour-on-press/src/main.rs"
 required-features = ["pimoroni-display-hat-mini"]
 
+[[example]]
+name = "mini-display-user-interface"
+path = "./examples/mini-display-user-interface/main.rs"
+required-features = ["pimoroni-display-hat-mini", "text"]
+
 [features]
 debug = ["rpi-display-mipidsi/debug"]
 bme280 = [] # DISABLED for now - `embedded_hal` alpha versionings had a lot of conflicts.
@@ -28,6 +33,7 @@ transitions = ["rpi-display-mipidsi/transitions"]
 
 [dependencies]
 async-mutex = { version = "1.4.0", optional = true }
+async-trait = "0.1.74"
 # bme280 = { version = "0.4.4", optional = true }
 embedded-graphics = "0.8.1"
 lazy_static = "1.4.0"

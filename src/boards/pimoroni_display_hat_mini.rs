@@ -1,9 +1,12 @@
 //! Pimoroni Display HAT Mini on a Raspberry Pi.
 //!
+//!
+use async_trait::async_trait;
 
 use crate::display_mipidsi::LcdST7789;
 use crate::display_mipidsi::{
-    traits::DisplayComponent, ColorInversion, DisplaySPIInterfaceNoCS, Orientation, TearingEffect,
+    traits::{BacklightComponent, DisplayComponent},
+    ColorInversion, DisplaySPIInterfaceNoCS, Orientation, TearingEffect,
 };
 use crate::errors::{IntoRPiResult, RPiResult};
 use crate::gpio::{func, traits::HardwareComponent, Button, DisplayBacklight, OutputPin, RgbLed};
@@ -115,9 +118,59 @@ impl PimoroniDisplayHATMini {
 impl HardwareComponent for PimoroniDisplayHATMini {}
 
 /// Mark the [`PimoroniDisplayHATMini`] as a [`DisplayComponent`].
-impl DisplayComponent<320, 240> for PimoroniDisplayHATMini {
+#[async_trait]
+impl DisplayComponent for PimoroniDisplayHATMini {
     type COLOUR = crate::display_mipidsi::pixelcolor::Rgb565;
     type DI = DisplaySPIInterfaceNoCS<Spi, OutputPin>;
     type MODEL = crate::display_mipidsi::screen_models::ST7789;
     type RST = OutputPin;
+
+    const W: u16 = 320;
+    const H: u16 = 240;
+
+    /// Clear the display.
+    async fn fill_display<'e>(&mut self, colour: Self::COLOUR) -> RPiResult<'e, ()> {
+        self.display.lock().await.fill(colour)
+    }
+}
+
+#[async_trait]
+impl BacklightComponent for PimoroniDisplayHATMini {
+    /// Turn the backlight off over an interval of time.
+    async fn backlight_fade_in<'e>(
+        &mut self,
+        step: u32,
+        duration: std::time::Duration,
+    ) -> RPiResult<'e, ()> {
+        self.display
+            .lock()
+            .await
+            .backlight
+            .transition_to(1., step, duration)
+            .await
+    }
+
+    /// Turn the backlight off over an interval of time.
+    async fn backlight_fade_out<'e>(
+        &mut self,
+        step: u32,
+        duration: std::time::Duration,
+    ) -> RPiResult<'e, ()> {
+        self.display
+            .lock()
+            .await
+            .backlight
+            .transition_to(0., step, duration)
+            .await
+    }
+
+    /// Turn the backlight on.
+    async fn backlight_on<'e>(&mut self) -> RPiResult<'e, f64> {
+        self.display.lock().await.backlight.set_value(1.)
+    }
+
+    /// Turn the backlight off.
+    async fn backlight_off<'e>(&mut self) -> RPiResult<'e, f64> {
+        self.display.lock().await.backlight.set_value(0.)
+    }
 }
