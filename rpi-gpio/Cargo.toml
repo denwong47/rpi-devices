@@ -14,5 +14,5 @@ embedded-graphics = "0.8.1"
 embedded-hal = "0.2.7"
 lazy_static = "1.4.0"
 rpi-errors = { version = "0.1.0", path = "../rpi-errors" }
-rppal = { version = "0.15.0", features = ["hal"] }
+rppal = { version = "0.16.1", features = ["hal"] }
 tokio = { version = "1.34.0", features = ["time", "rt-multi-thread", "macros", "signal"] }

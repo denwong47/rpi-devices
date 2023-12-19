@@ -1,69 +1,74 @@
-use crate::{
-    common::*,
-    config::{self, BUTTON_ICON_MARGIN},
-};
+use super::{common, Corner, CornerButton};
+use crate::{common::*, config};
+use std::sync::Arc;
 
-pub struct Menu<A, B, X, Y>
-where
-    A: Send,
-    B: Send,
-    X: Send,
-    Y: Send,
-{
-    pub action_x: X,
-    pub action_y: Y,
-    pub action_a: A,
-    pub action_b: B,
+pub struct Menu {
+    pub action_x: &'static CornerButton<'static>,
+    pub action_y: &'static CornerButton<'static>,
+    pub action_a: &'static CornerButton<'static>,
+    pub action_b: &'static CornerButton<'static>,
+}
+
+impl Menu {
+    /// Create a new [`Menu`] instance.
+    pub fn new(
+        action_x: &'static CornerButton<'static>,
+        action_y: &'static CornerButton<'static>,
+        action_a: &'static CornerButton<'static>,
+        action_b: &'static CornerButton<'static>,
+    ) -> Self {
+        Self {
+            action_x,
+            action_y,
+            action_a,
+            action_b,
+        }
+    }
+
+    /// Redraw the [`Menu`] on the display.
+    pub async fn redraw<'e>(&self, hat: &PimoroniDisplayHATMini) -> RPiResult<'e, ()> {
+        self.action_a
+            .draw(hat, Corner::TopLeft, hat.button_a.is_pressed())
+            .await?;
+        self.action_b
+            .draw(hat, Corner::BottomLeft, hat.button_b.is_pressed())
+            .await?;
+        self.action_x
+            .draw(hat, Corner::TopRight, hat.button_x.is_pressed())
+            .await?;
+        self.action_y
+            .draw(hat, Corner::BottomRight, hat.button_y.is_pressed())
+            .await?;
+
+        common::draw_mid_title(hat, "Main Menu").await?;
+        common::draw_menu_lines(hat).await?;
+
+        Ok(())
+    }
 }
 
 #[async_trait]
-impl<A, B, X, Y> UserInterface<PimoroniDisplayHATMini> for Menu<A, B, X, Y>
-where
-    A: Send,
-    B: Send,
-    X: Send,
-    Y: Send,
-{
+impl UserInterface<PimoroniDisplayHATMini> for Menu {
+    /// Execute the [`Menu`] user interface.
     async fn execute<'e>(
-        &mut self,
-        hat: &mut PimoroniDisplayHATMini,
-    ) -> RPiResult<'e, Option<Box<dyn UserInterface<PimoroniDisplayHATMini>>>> {
+        &self,
+        hat: &PimoroniDisplayHATMini,
+    ) -> RPiResult<'e, Option<Arc<dyn UserInterface<PimoroniDisplayHATMini>>>> {
         hat.fill_display(Rgb565::BLACK).await?;
-        {
-            let mut display = hat.display.lock().await;
-            const BUTTON_WIDTH: i32 = (config::BUTTON_ICON_WIDTH + BUTTON_ICON_MARGIN * 2) as i32;
-            const DIVIDER_HEIGHT: i32 = (PimoroniDisplayHATMini::H / 2) as i32;
-            display.draw_title::<20>("Press the A button", Rgb565::WHITE, None, None)?;
-            display.draw_vertical_line(BUTTON_WIDTH, Rgb565::WHITE, 2)?;
-            display.draw_vertical_line(
-                PimoroniDisplayHATMini::W as i32 - BUTTON_WIDTH,
-                Rgb565::WHITE,
-                2,
-            )?;
-            display.draw_line(
-                Point::new(0, DIVIDER_HEIGHT),
-                Point::new(BUTTON_WIDTH, DIVIDER_HEIGHT),
-                Rgb565::WHITE,
-                2,
-            )?;
-            display.draw_line(
-                Point::new(PimoroniDisplayHATMini::W as i32, DIVIDER_HEIGHT),
-                Point::new(
-                    PimoroniDisplayHATMini::W as i32 - BUTTON_WIDTH,
-                    DIVIDER_HEIGHT,
-                ),
-                Rgb565::WHITE,
-                2,
-            )?;
-        }
+        self.redraw(hat).await?;
         hat.backlight_fade_in(config::FADE_IN_STEPS, config::FADE_IN_DURATION)
             .await?;
 
-        hat.button_a.pressed_and_released(None).await?;
+        let next = tokio::select! {
+            next_a = self.action_a.handler(hat, Corner::TopLeft) => next_a,
+            next_b = self.action_b.handler(hat, Corner::BottomLeft) => next_b,
+            next_x = self.action_x.handler(hat, Corner::TopRight) => next_x,
+            _ = self.action_y.handler(hat, Corner::BottomRight) => Ok(None),
+        }?;
 
         hat.backlight_fade_out(config::FADE_IN_STEPS, config::FADE_IN_DURATION)
             .await?;
 
-        Ok(None)
+        Ok(next)
     }
 }

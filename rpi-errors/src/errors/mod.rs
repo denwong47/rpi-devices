@@ -42,6 +42,12 @@ pub enum RPiError<'e> {
     #[error("Operation Cancelled.")]
     Cancelled,
 
+    #[error("`{0}` object is not yet initialised, cannot be used yet.")]
+    NotInitialised(Cow<'e, str>),
+
+    #[error("`{0}` object is already initialised, cannot be initialised again.")]
+    AlreadyInitialised(Cow<'e, str>),
+
     /// Catch all errors
     #[error("Unexpected error: {0}")]
     Unknown(Cow<'e, str>),

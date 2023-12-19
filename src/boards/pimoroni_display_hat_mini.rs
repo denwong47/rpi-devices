@@ -129,7 +129,7 @@ impl DisplayComponent for PimoroniDisplayHATMini {
     const H: u16 = 240;
 
     /// Clear the display.
-    async fn fill_display<'e>(&mut self, colour: Self::COLOUR) -> RPiResult<'e, ()> {
+    async fn fill_display<'e>(&self, colour: Self::COLOUR) -> RPiResult<'e, ()> {
         self.display.lock().await.fill(colour)
     }
 }
@@ -138,7 +138,7 @@ impl DisplayComponent for PimoroniDisplayHATMini {
 impl BacklightComponent for PimoroniDisplayHATMini {
     /// Turn the backlight off over an interval of time.
     async fn backlight_fade_in<'e>(
-        &mut self,
+        &self,
         step: u32,
         duration: std::time::Duration,
     ) -> RPiResult<'e, ()> {
@@ -152,7 +152,7 @@ impl BacklightComponent for PimoroniDisplayHATMini {
 
     /// Turn the backlight off over an interval of time.
     async fn backlight_fade_out<'e>(
-        &mut self,
+        &self,
         step: u32,
         duration: std::time::Duration,
     ) -> RPiResult<'e, ()> {
@@ -165,12 +165,12 @@ impl BacklightComponent for PimoroniDisplayHATMini {
     }
 
     /// Turn the backlight on.
-    async fn backlight_on<'e>(&mut self) -> RPiResult<'e, f64> {
+    async fn backlight_on<'e>(&self) -> RPiResult<'e, f64> {
         self.display.lock().await.backlight.set_value(1.)
     }
 
     /// Turn the backlight off.
-    async fn backlight_off<'e>(&mut self) -> RPiResult<'e, f64> {
+    async fn backlight_off<'e>(&self) -> RPiResult<'e, f64> {
         self.display.lock().await.backlight.set_value(0.)
     }
 }

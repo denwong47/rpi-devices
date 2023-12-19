@@ -3,6 +3,9 @@ pub mod func;
 mod models;
 pub use models::*;
 
+#[cfg(feature = "bmp")]
+pub use tinybmp::Bmp;
+
 #[cfg(feature = "text")]
 pub use models::text;
 
@@ -22,6 +25,7 @@ pub use embedded_graphics::{
     draw_target::{Clipped, ColorConverted, Cropped, DrawTarget, DrawTargetExt},
     image::{Image, ImageRaw, SubImage},
     pixelcolor,
+    pixelcolor::raw::{BigEndian, ByteOrder, LittleEndian},
     prelude::*,
     primitives,
 };

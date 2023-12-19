@@ -17,7 +17,7 @@ where
     ///
     /// It will be drawn from the top left corner of the display, and any pixels
     /// that are outside the display area will be ignored.
-    pub fn draw_image<'e, T>(&mut self, image: Image<'_, T>) -> RPiResult<'e, ()>
+    pub fn draw_image<'e, T>(&mut self, image: &Image<'_, T>) -> RPiResult<'e, ()>
     where
         T: ImageDrawable<Color = MODEL::ColorFormat>,
     {

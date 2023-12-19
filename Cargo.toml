@@ -14,19 +14,18 @@ required-features = ["pimoroni-display-hat-mini"]
 [[example]]
 name = "mini-display-user-interface"
 path = "./examples/mini-display-user-interface/main.rs"
-required-features = ["pimoroni-display-hat-mini", "text"]
+required-features = ["pimoroni-display-hat-mini", "text", "bmp"]
 
 [features]
 debug = ["rpi-display-mipidsi/debug"]
 bme280 = [] # DISABLED for now - `embedded_hal` alpha versionings had a lot of conflicts.
 # bme280 = ["dep:bme280"]
 ltr-559 = ["dep:ltr-559"]
-pimoroni-display-hat-mini = ["dep:async-mutex", "rpi-gpio/pimoroni-display-hat-mini", "bmp", "library"]
-pimoroni-enviro-plus = ["dep:async-mutex", "ltr-559", "bme280", "bmp", "library"]
+pimoroni-display-hat-mini = ["dep:async-mutex", "rpi-gpio/pimoroni-display-hat-mini", "bmp"]
+pimoroni-enviro-plus = ["dep:async-mutex", "ltr-559", "bme280", "bmp"]
 bmp = ["rpi-display-mipidsi/bmp"]
 text = ["rpi-display-mipidsi/text"]
 plot = ["rpi-display-mipidsi/plot"]
-library = ["rpi-display-mipidsi/library"]
 simd = ["rpi-display-mipidsi/simd"]
 nightly = ["rpi-display-mipidsi/nightly"]
 transitions = ["rpi-display-mipidsi/transitions"]
@@ -43,7 +42,7 @@ rpi-errors = { path = "rpi-errors" }
 rpi-gpio = { path = "rpi-gpio" }
 rpi-logger = { version = "0.1.0", path = "rpi-logger" }
 rpi-system = { path = "rpi-system" }
-rppal = { version = "0.15.0", features = ["hal"] }
+rppal = { version = "0.16.1", features = ["hal"] }
 thiserror = "1.0.50"
 tokio = { version = "1.34.0", features = ["time", "rt-multi-thread", "macros", "signal"] }
 

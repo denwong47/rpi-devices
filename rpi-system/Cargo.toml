@@ -8,4 +8,4 @@ edition = "2021"
 [dependencies]
 lazy_static = "1.4.0"
 rpi-errors = { version = "0.1.0", path = "../rpi-errors" }
-rppal = "0.15.0"
+rppal = "0.16.1"
