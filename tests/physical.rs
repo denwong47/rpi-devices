@@ -7,7 +7,7 @@
 use std::ops::DerefMut;
 
 use rpi_devices::{
-    display_mipidsi::{func as img_func, *},
+    display_mipidsi::{func as img_func, images, pixelcolor, ByteOrder, *},
     errors::{IntoRPiResult, RPiResult},
 };
 
@@ -72,6 +72,7 @@ mod pimoroni_display_hat_mini {
         boards::PimoroniDisplayHATMini,
         gpio::{func, Button, DisplayBacklight, RgbLed},
     };
+    use rpi_display_mipidsi::traits::BacklightComponent;
 
     #[tokio::test]
     async fn physical_press() {
@@ -237,7 +238,7 @@ mod pimoroni_display_hat_mini {
 
             for (id, raw) in raws.into_iter().enumerate() {
                 if id == 0 {
-                    lcd.draw_image(img_func::image_conversions::image_from_raw(&raw, 0, 0))
+                    lcd.draw_image(&img_func::image_conversions::image_from_raw(&raw, 0, 0))
                         .expect("Failed to draw image.");
 
                     // For the first image, once we have loaded the image to the screen, we
@@ -292,7 +293,7 @@ mod pimoroni_display_hat_mini {
             let sub_image = img_func::crop::crop_horizontal(&bmp, (step * 40 / STEPS) as i32, 320);
 
             let image = img_func::image_conversions::image_from_raw(&sub_image, 0, 0);
-            display.draw_image(image).expect("Failed to draw image.");
+            display.draw_image(&image).expect("Failed to draw image.");
 
             if step < 32 {
                 display
@@ -356,6 +357,73 @@ mod pimoroni_display_hat_mini {
         lcd.backlight
             .disable()
             .expect("Failed to disable backlight.");
+    }
+
+    #[tokio::test]
+    #[serial]
+    async fn physical_owned_image_raw() {
+        let image = images::OwnedImageRaw::<pixelcolor::Rgb565, BigEndian>::from_path_size(
+            "tests/images/bus.bin",
+            Size::new(320, 240),
+        )
+        .await
+        .expect("Failed to load image.");
+
+        let unit = PimoroniDisplayHATMini::init().expect("Failed to initialize Display HAT Mini.");
+
+        unit.display
+            .lock()
+            .await
+            .draw_image(image.image().expect("Failed to create image."))
+            .expect("Failed to draw image.");
+
+        let duration = Duration::from_secs(2);
+        unit.backlight_fade_in(32, duration)
+            .await
+            .expect("Failed to fade in backlight.");
+        tokio::time::sleep(duration).await;
+        unit.backlight_fade_out(32, duration)
+            .await
+            .expect("Failed to fade out backlight.");
+    }
+
+    #[tokio::test]
+    #[cfg(feature = "bmp")]
+    #[serial]
+    async fn physical_owned_bmp() {
+        use rpi_display_mipidsi::images::OwnsImage;
+
+        let image = images::OwnedBmp::<pixelcolor::Rgb565>::from_path("tests/images/panorama.bmp")
+            .await
+            .expect("Failed to load image.");
+
+        let unit = PimoroniDisplayHATMini::init().expect("Failed to initialize Display HAT Mini.");
+
+        const TRANSVERE: u32 = 463;
+        const STEPS: u32 = TRANSVERE / 3;
+
+        unit.backlight_on()
+            .await
+            .expect("Failed to turn on backlight.");
+
+        let duration = Duration::from_secs(2);
+        {
+            let mut display = unit.display.lock().await;
+            let transition = img_func::transitions::transverse(STEPS, 0, 0, TRANSVERE, 0);
+            display
+                .draw_transition_to(
+                    image.raw().expect("Failed to create image."),
+                    transition,
+                    STEPS,
+                    Duration::from_secs(22),
+                )
+                .await
+                .expect("Failed to draw image.");
+        }
+
+        unit.backlight_fade_out(32, duration)
+            .await
+            .expect("Failed to fade out backlight.");
     }
 
     #[tokio::test]

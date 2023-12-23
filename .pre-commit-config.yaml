@@ -41,7 +41,7 @@ repos:
     hooks:
       - id: cargo-clippy
         name: cargo-clippy
-        entry: bash -c 'cargo clippy --fix --allow-staged --features=pimoroni-display-hat-mini,bmp,text -- -D warnings'
+        entry: bash -c 'cargo clippy --fix --allow-staged --features=pimoroni-display-hat-mini,bmp,text,transitions -- -D warnings'
         language: system
         fail_fast: true
 # -   repo: local

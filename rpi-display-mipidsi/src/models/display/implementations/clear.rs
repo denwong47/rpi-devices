@@ -7,7 +7,7 @@ where
     RST: OutputPinType,
 {
     /// Clears the display.
-    pub fn fill(&mut self, colour: MODEL::ColorFormat) -> RPiResult<()> {
+    pub fn fill<'e>(&mut self, colour: MODEL::ColorFormat) -> RPiResult<'e, ()> {
         self.screen
             .clear(colour)
             .map_err(|_| RPiError::DisplayOutputError)

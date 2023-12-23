@@ -2,3 +2,4 @@
 //!
 
 mod line;
+mod shapes;

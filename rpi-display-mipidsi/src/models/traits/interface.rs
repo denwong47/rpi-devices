@@ -1,21 +1,20 @@
 //! An async interface for the MIPI DSI display.
 //!
 
-use crate::{foreign_types::*, LcdDisplay};
+use crate::foreign_types::*;
 use async_trait::async_trait;
+use std::sync::Arc;
 
 use super::DisplayComponent;
 
 #[async_trait]
-pub trait UserInterface<DC, const W: u16, const H: u16>
+pub trait UserInterface<DC>: Send + Sync
 where
-    DC: DisplayComponent<W, H>,
+    DC: DisplayComponent + Sync,
 {
-    type Return;
-
     /// Execute the interface on the target [`LcdDisplay`].
     async fn execute<'e>(
-        &mut self,
-        display: &mut LcdDisplay<DC::DI, DC::MODEL, DC::RST, W, H>,
-    ) -> RPiResult<'e, Self::Return>;
+        &self,
+        display_component: &DC,
+    ) -> RPiResult<'e, Option<Arc<dyn UserInterface<DC>>>>;
 }
